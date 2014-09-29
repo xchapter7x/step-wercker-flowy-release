@@ -1,0 +1,8 @@
+name: flowy-deploy
+version: 0.0.1
+description: a wercker step to help with automatic deploys inspired by gitflow
+keywords:
+  - gitflow
+  - tags
+  - release
+  - versioning
