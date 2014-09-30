@@ -18,14 +18,15 @@ field_flags = {
 
 def required_field_check(required_fields, env_variables):
   checkPassed = True
+  msg = ""
 
   for fieldname in required_fields:
 
     if not env_variables.has_key(fieldname):
       checkPassed = False
-      print("Required ENV Variable not set: %s" % (fieldname))
+      msg += "Required ENV Variable not set: %s" % (fieldname)
     
-  return checkPassed
+  return (msg, checkPassed)
 
 def version_increment_string(current_version):
   return """echo """+current_version+""" | awk -F. -v OFS=. 'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}'"""
@@ -57,7 +58,7 @@ def get_current_tag(functor):
   out, err = functor(tag_match_string())
 
   if not err:
-    tags = out.sort(reverse=True)
+    tags = sorted(out, reverse=True)
     current_tag = tags[0]
 
   return current_tag
@@ -74,8 +75,9 @@ def get_next_tag(functor):
 
 def run():
   exitcode = 0
+  msg, err = required_field_check(required_fields, os.environ)
 
-  if not required_field_check(required_fields, os.environ):
+  if not err:
     print("do nothing")
     out, err = system_call(tag_match_string())
     print(out, err)
@@ -85,7 +87,7 @@ def run():
     print(  get_next_tag(system_call) )
 
   else:
-    print("FAILED!!!")
+    print("FAILED!!! %s" % msg)
     exitcode = 1
 
   exit(exitcode)

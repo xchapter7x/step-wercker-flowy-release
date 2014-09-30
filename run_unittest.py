@@ -4,15 +4,36 @@ import os
 
 success_output = "some success output"
 failure_output = "some error output"
+next_tag = "v1.0.02"
+default_next_tag = "v01.00.0002"
+current_tag = "v1.0.01"
+default_current_tag = "v01.00.0001"
 
 def system_call_mock_success(cmdString):
   return (success_output, False)
+
+def system_call_mock_next_tag(cmdString):
+
+  if cmdString == run.version_increment_string(current_tag):
+    return run.system_call(cmdString)
+
+  else:
+    return ([current_tag], False)
+
+def system_call_mock_next_tag_default(cmdString):
+
+  if cmdString == run.version_increment_string(default_current_tag):
+    return run.system_call(cmdString)
+
+  else:
+    return ([run.field_flags["WERCKER_FLOWY_DEPLOY_START_VERSION"]], False)
+
 
 def system_call_mock_failure(cmdString):
   return (failure_output, True)
 
 def current_tag_functor_default_mock(cmdString):
-  return ([cmdString], True)
+  return ([cmdString], False)
 
 class ParserTestCase(unittest.TestCase):
   """Tests for `run.py`."""
@@ -71,7 +92,7 @@ class ParserTestCase(unittest.TestCase):
     are not set
     """
     mockEnv = {}
-    response = run.required_field_check(self.required_fields, mockEnv)
+    msg, response = run.required_field_check(self.required_fields, mockEnv)
     self.assertFalse(response)
 
   def test_required_field_check_partial(self):
@@ -81,7 +102,7 @@ class ParserTestCase(unittest.TestCase):
     """
     mockEnv = {}
     mockEnv["WERCKER_FLOWY_DEPLOY_ACTION"] = "test"
-    response = run.required_field_check(self.required_fields, mockEnv)
+    msg, response = run.required_field_check(self.required_fields, mockEnv)
     self.assertFalse(response)
 
   def test_required_field_check_clean(self):
@@ -91,27 +112,46 @@ class ParserTestCase(unittest.TestCase):
     mockEnv = {}
     mockEnv["WERCKER_FLOWY_DEPLOY_ACTION"] = "test"
     mockEnv["WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"] = "test"
-    response = run.required_field_check(self.required_fields, mockEnv)
+    msg, response = run.required_field_check(self.required_fields, mockEnv)
     self.assertTrue(response)
 
-  #def test_get_current_tag(self):
-    #"""
-    #this should return the current tag from 
-    #the given functor when the functor is
-    #passed the proper string
-    #"""
-    #response = run.get_current_tag(current_tag_functor_default_mock)
-    #print(response)
-    #self.assertTrue(response)
+  def test_get_current_tag_default(self):
+    """
+    should run the functor passed the default value
+    """
+    control = 'git tag -l | egrep "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"'
+    response = run.get_current_tag(current_tag_functor_default_mock)
+    self.assertEqual(response, control)
 
-"""
-    def test_tag_match_string:
-    def test_version_increment_string:
-    
-    
-    def test_get_next_tag
-    def test_run
-"""
+  def test_get_current_tag_env(self):
+    """
+    should run the functor passed the ENV_VAR value
+    """
+    revert = run.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"]
+    control = 'my control env variable'
+    run.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"] = control
+    response = run.get_current_tag(current_tag_functor_default_mock)
+    self.assertEqual(response, "git tag -l | egrep \"{0}\"".format(control))
+    run.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"] = revert
+
+  def test_get_next_tag(self):
+    """
+    should return an incremented version
+    tag from the value it is passed
+    """
+    current = current_tag
+    control = next_tag
+    newVersion = run.get_next_tag(system_call_mock_next_tag)
+    self.assertEqual(newVersion, control)
+
+  def test_get_next_tag_default(self):
+    """
+    should return an incremented version
+    tag from the default version
+    """
+    control = default_next_tag
+    newVersion = run.get_next_tag(system_call_mock_next_tag_default)
+    self.assertEqual(newVersion, control)
 
 if __name__ == '__main__':
   unittest.main()
