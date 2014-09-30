@@ -10,6 +10,12 @@ build:
           sudo apt-get install -y python
 
     - script:
+        name: Install git-flow cli
+        code: |
+          sudo wget -P /tmp http://launchpadlibrarian.net/84618376/git-flow_0.4.1-2_all.deb
+          sudo dpkg -i /tmp/git-flow_0.4.1-2_all.deb
+
+    - script:
         name: Run some basic unit tests
         code: |
           python run_unittest.py
