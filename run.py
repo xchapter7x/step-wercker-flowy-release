@@ -65,6 +65,9 @@ def run():
     }
     imsg, ierr = run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"], supported_actions)
     print(imsg, ierr)
+    
+    if ierr:
+      exitcode = 1
 
   else:
     print("FAILED!!! %s" % msg)

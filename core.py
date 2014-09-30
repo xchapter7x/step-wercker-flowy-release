@@ -7,10 +7,19 @@ required_fields = [
   "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
 ]
 
+def get_active_flag():
+  active_string = os.environ.get("WERCKER_FLOWY_DEPLOY_ACTIVE", "true")
+  active_flag = True
+
+  if active_string == "false":
+    active_flag = False
+
+  return active_flag
+
 field_flags = {
   "WERCKER_FLOWY_DEPLOY_ACTION":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTION", None),
   "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME", None),
-  "WERCKER_FLOWY_DEPLOY_ACTIVE":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTIVE", True),
+  "WERCKER_FLOWY_DEPLOY_ACTIVE":              get_active_flag(),
   "WERCKER_FLOWY_DEPLOY_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
   "WERCKER_FLOWY_DEPLOY_START_VERSION":       os.environ.get("WERCKER_FLOWY_DEPLOY_START_VERSION", "v01.00.0001"),
   "WERCKER_FLOWY_DEPLOY_TAG_MESSAGE":         os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_MESSAGE", "Auto-Generated-Tag")
