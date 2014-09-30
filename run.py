@@ -3,31 +3,38 @@ import subprocess
 import sys
 import core
 
-def create_tag():
-  print("create tag")
+def get_latest(functor):
+  msg = ""
+  err = False
+  variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+  env_var_name = core.field_flags[variable_keyname]
+  tag = core.get_current_tag(functor) 
 
-def get_latest():
-  core.get_current_tag(core.system_call) 
-  print("get latest")
+  if env_var_name != None and tag != None:
+    msg = tag
+    os.environ[env_var_name] = msg
 
-def get_next():
-  print("get next")
+  else:
+    msg = "no variable name value passed or None Tag Value"
+    err = True
+  
+  return (msg, err)
 
-def cut_release():
-  print("cut release")
+def create_tag(functor):
+  return (None, False)
+
+def get_next(functor):
+  return (None, False)
+
+def cut_release(functor):
+  return (None, False)
 
 def run_action(action, supported_actions):
   msg = ""
   err = False
-  supported_actions = {
-    "create-tag": create_tag,
-    "get-latest": get_latest,
-    "get-next": get_next,
-    "cut-release": cut_release
-  }
-
+  
   if action in supported_actions:
-    supported_actions[action]()
+    msg, err = supported_actions[action](core.system_call)
 
   else:
     err = True
@@ -37,20 +44,17 @@ def run_action(action, supported_actions):
 
 def run():
   exitcode = 0
-  msg, err = core.required_field_check(core.required_fields, os.environ)
+  msg, err = core.should_run()
 
   if not err:
-    run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"])
-
-    """
-    print("do nothing")
-    out, err = system_call(tag_match_string())
-    print(out, err)
-    out, err = system_call(version_increment_string("v1.0.4"))
-    print(out, err)
-    print( get_current_tag(system_call) )
-    print(  get_next_tag(system_call) )
-    """
+    supported_actions = {
+      "create-tag": create_tag,
+      "get-latest": get_latest,
+      "get-next": get_next,
+      "cut-release": cut_release
+    }
+    imsg, ierr = run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"], supported_actions)
+    print(imsg, ierr)
 
   else:
     print("FAILED!!! %s" % msg)
@@ -60,3 +64,16 @@ def run():
 
 if __name__ == '__main__':
   run()
+
+
+  
+"""
+print("do nothing")
+out, err = system_call(tag_match_string())
+print(out, err)
+out, err = system_call(version_increment_string("v1.0.4"))
+print(out, err)
+print( get_current_tag(system_call) )
+print(  get_next_tag(system_call) )
+"""
+

@@ -8,8 +8,8 @@ required_fields = [
 ]
 
 field_flags = {
-  "WERCKER_FLOWY_DEPLOY_ACTION":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTION", ""),
-  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME", ""),
+  "WERCKER_FLOWY_DEPLOY_ACTION":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTION", None),
+  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME", None),
   "WERCKER_FLOWY_DEPLOY_ACTIVE":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTIVE", True),
   "WERCKER_FLOWY_DEPLOY_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
   "WERCKER_FLOWY_DEPLOY_START_VERSION":       os.environ.get("WERCKER_FLOWY_DEPLOY_START_VERSION", "v01.00.0001"),
@@ -27,6 +27,14 @@ def required_field_check(required_fields, env_variables):
       msg += "Required ENV Variable not set: %s" % (fieldname)
     
   return (msg, checkPassed)
+
+def is_active():
+  return field_flags["WERCKER_FLOWY_DEPLOY_ACTIVE"]
+
+def should_run():
+  msg, passed = required_field_check(required_fields, os.environ)
+  rerr = (not is_active() or not passed)
+  return (msg, rerr)
 
 def version_increment_string(current_version):
   return """echo """+current_version+""" | awk -F. -v OFS=. 'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}'"""
