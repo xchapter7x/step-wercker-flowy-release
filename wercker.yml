@@ -18,4 +18,4 @@ build:
     - script:
         name: Run some basic unit tests
         code: |
-          python run_unittest.py
+          ls *_unittest.py | awk '{system("python " $1)}'

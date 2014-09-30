@@ -1,83 +1,48 @@
 import os
 import subprocess
 import sys
+import core
 
-required_fields = [
-  "WERCKER_FLOWY_DEPLOY_ACTION",
-  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
-]
+def create_tag():
+  print("create tag")
 
-field_flags = {
-  "WERCKER_FLOWY_DEPLOY_ACTION":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTION", ""),
-  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME", ""),
-  "WERCKER_FLOWY_DEPLOY_ACTIVE":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTIVE", True),
-  "WERCKER_FLOWY_DEPLOY_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
-  "WERCKER_FLOWY_DEPLOY_START_VERSION":       os.environ.get("WERCKER_FLOWY_DEPLOY_START_VERSION", "v01.00.0001"),
-  "WERCKER_FLOWY_DEPLOY_TAG_MESSAGE":         os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_MESSAGE", "Auto-Generated-Tag")
-}
+def get_latest():
+  core.get_current_tag(core.system_call) 
+  print("get latest")
 
-def required_field_check(required_fields, env_variables):
-  checkPassed = True
+def get_next():
+  print("get next")
+
+def cut_release():
+  print("cut release")
+
+def run_action(action, supported_actions):
   msg = ""
-
-  for fieldname in required_fields:
-
-    if not env_variables.has_key(fieldname):
-      checkPassed = False
-      msg += "Required ENV Variable not set: %s" % (fieldname)
-    
-  return (msg, checkPassed)
-
-def version_increment_string(current_version):
-  return """echo """+current_version+""" | awk -F. -v OFS=. 'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}'"""
-
-def tag_match_string():
-  output = ""
-  return ("git tag -l | egrep \"%s\"" % field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"])
-
-def make_array_from_stdout(output):
-  output = output.rstrip("\n").split("\n")
-  return output
-
-def system_call(cmdString):
-  output = []
   err = False
+  supported_actions = {
+    "create-tag": create_tag,
+    "get-latest": get_latest,
+    "get-next": get_next,
+    "cut-release": cut_release
+  }
 
-  try:
-    stdout = subprocess.check_output(cmdString, shell=True)
-    output = make_array_from_stdout(stdout)
-    
-  except subprocess.CalledProcessError as e:
-    output = "error: {0}".format(e)
+  if action in supported_actions:
+    supported_actions[action]()
+
+  else:
     err = True
+    msg = "Key {0} does not exist".format(action)
 
-  return (output, err)
-
-def get_current_tag(functor):
-  current_tag = None
-  out, err = functor(tag_match_string())
-
-  if not err:
-    tags = sorted(out, reverse=True)
-    current_tag = tags[0]
-
-  return current_tag
-
-def get_next_tag(functor):
-  current = get_current_tag(functor)
-  
-  if current == None:
-    current = field_flags["WERCKER_FLOWY_DEPLOY_START_VERSION"]
-
-  out, err = functor(version_increment_string(current))
-  return out[0]
-
+  return (msg, err)
 
 def run():
   exitcode = 0
-  msg, err = required_field_check(required_fields, os.environ)
+  msg, err = core.required_field_check(core.required_fields, os.environ)
 
   if not err:
+    run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"])
+
+    """
     print("do nothing")
     out, err = system_call(tag_match_string())
     print(out, err)
@@ -85,6 +50,7 @@ def run():
     print(out, err)
     print( get_current_tag(system_call) )
     print(  get_next_tag(system_call) )
+    """
 
   else:
     print("FAILED!!! %s" % msg)
