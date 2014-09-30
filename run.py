@@ -3,12 +3,12 @@ import subprocess
 import sys
 import core
 
-def get_latest(functor):
+def get_a_tag_using(functorArg, mainFunctor):
   msg = ""
   err = False
   variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
   env_var_name = core.field_flags[variable_keyname]
-  tag = core.get_current_tag(functor) 
+  tag = mainFunctor(functorArg) 
 
   if env_var_name != None and tag != None:
     msg = tag
@@ -20,10 +20,13 @@ def get_latest(functor):
   
   return (msg, err)
 
-def create_tag(functor):
-  return (None, False)
+def get_latest(functor):
+  return get_a_tag_using(functor, core.get_current_tag)
 
 def get_next(functor):
+  return get_a_tag_using(functor, core.get_next_tag)
+
+def create_tag(functor):
   return (None, False)
 
 def cut_release(functor):

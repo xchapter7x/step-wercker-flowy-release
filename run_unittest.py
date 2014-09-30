@@ -54,11 +54,40 @@ class RunTestCase(unittest.TestCase):
     latest, err = run.get_latest(mock_success_passthrough)
     self.assertTrue(err)
 
+  def test_for_get_next_unset(self):
+    """
+    get_next should return a default based value when no tags
+    are found
+    """
+    control = 'echo v01.00.0001 | awk -F. -v OFS=. \'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}\''
+    variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+    core.field_flags[variable_keyname] = "MY_TEST_VAR"
+    latest, err = run.get_next(mock_error_passthrough)
+    self.assertEqual(latest, control)
+    self.assertFalse(err)
 
+  def test_for_get_next(self):
+    """
+    get_next should return version_tag
+    returned from the functor
+    """
+    variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+    core.field_flags[variable_keyname] = "MY_TEST_VAR"
+    control = 'echo git tag -l | egrep "v([0-9]{1,2})\\.([0-9]{1,2})\\.([0-9]{1,4})" | awk -F. -v OFS=. \'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}\''
+    latest, err = run.get_next(mock_success_passthrough)
+    self.assertEqual(latest, control)
+    self.assertEqual(os.environ[core.field_flags[variable_keyname]], control)
+    self.assertFalse(err)
 
-
-
-
+  def test_for_get_next_unset_var(self):
+    """
+    get_next should return an 
+    error if there is no variable name set
+    """
+    variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+    core.field_flags[variable_keyname] = None
+    latest, err = run.get_next(mock_success_passthrough)
+    self.assertTrue(err)
 
 
 
@@ -79,13 +108,6 @@ class RunTestCase(unittest.TestCase):
     latest, err = run.create_tag(mock_error_passthrough)
     self.assertEqual(latest, control)
 
-  def test_for_get_next(self):
-    """
-    test
-    """
-    control = None
-    latest, err = run.get_next(mock_error_passthrough)
-    self.assertEqual(latest, control)
 
   def test_for_cut_release(self):
     """
