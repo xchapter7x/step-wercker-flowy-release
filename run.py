@@ -27,7 +27,7 @@ def get_next(functor):
   return get_a_tag_using(functor, core.get_next_tag)
 
 def gitflow_release_start_command_string(version):
-  return "git flow release start {0} {1}".format(version, "$WERCKER_GIT_COMMIT")
+  return "git flow release start {0} {1}".format(version, "develop")
 
 def gitflow_release_finish_command_string(version):
   message_text = core.field_flags["WERCKER_FLOWY_RELEASE_TAG_MESSAGE"].replace(" ", "-")
@@ -36,9 +36,14 @@ def gitflow_release_finish_command_string(version):
 
 def complete_release(functor):
   tag = core.get_next_tag(functor)
+  functor("git checkout -b master origin/master")
+  functor("git checkout -b develop origin/develop")
+  functor("git flow init -fd")
   smsg, serr = functor(gitflow_release_start_command_string(tag))
   fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
-  return (smsg+fmsg, (serr or ferr))
+  msg_chain = smsg+fmsg
+  err_chain = (serr or ferr)
+  return (msg_chain, err_chain)
 
 def run_action(action, supported_actions):
   msg = ""
