@@ -26,7 +26,7 @@ def system_call_mock_next_tag_default(cmdString):
     return core.system_call(cmdString)
 
   else:
-    return ([core.field_flags["WERCKER_FLOWY_DEPLOY_START_VERSION"]], False)
+    return ([core.field_flags["WERCKER_FLOWY_RELEASE_START_VERSION"]], False)
 
 
 def system_call_mock_failure(cmdString):
@@ -41,8 +41,8 @@ class CoreTestCase(unittest.TestCase):
   @classmethod
   def setUpClass(self):
     self.required_fields = [
-      "WERCKER_FLOWY_DEPLOY_ACTION",
-      "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+      "WERCKER_FLOWY_RELEASE_ACTION",
+      "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME"
     ]
 
   def test_system_call_success(self):
@@ -101,7 +101,7 @@ class CoreTestCase(unittest.TestCase):
     are not set
     """
     mockEnv = {}
-    mockEnv["WERCKER_FLOWY_DEPLOY_ACTION"] = "test"
+    mockEnv["WERCKER_FLOWY_RELEASE_ACTION"] = "test"
     msg, response = core.required_field_check(self.required_fields, mockEnv)
     self.assertFalse(response)
 
@@ -110,8 +110,8 @@ class CoreTestCase(unittest.TestCase):
     should return true if all requireds are set
     """
     mockEnv = {}
-    mockEnv["WERCKER_FLOWY_DEPLOY_ACTION"] = "test"
-    mockEnv["WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"] = "test"
+    mockEnv["WERCKER_FLOWY_RELEASE_ACTION"] = "test"
+    mockEnv["WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME"] = "test"
     msg, response = core.required_field_check(self.required_fields, mockEnv)
     self.assertTrue(response)
 
@@ -127,12 +127,12 @@ class CoreTestCase(unittest.TestCase):
     """
     should run the functor passed the ENV_VAR value
     """
-    revert = core.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"]
+    revert = core.field_flags["WERCKER_FLOWY_RELEASE_TAG_REGEX"]
     control = 'my control env variable'
-    core.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"] = control
+    core.field_flags["WERCKER_FLOWY_RELEASE_TAG_REGEX"] = control
     response = core.get_current_tag(current_tag_functor_default_mock)
     self.assertEqual(response, "git tag -l | egrep \"{0}\"".format(control))
-    core.field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"] = revert
+    core.field_flags["WERCKER_FLOWY_RELEASE_TAG_REGEX"] = revert
 
   def test_get_next_tag(self):
     """

@@ -6,7 +6,7 @@ import core
 def get_a_tag_using(functorArg, mainFunctor):
   msg = ""
   err = False
-  variable_keyname = "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+  variable_keyname = "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME"
   env_var_name = core.field_flags[variable_keyname]
   tag = mainFunctor(functorArg) 
 
@@ -30,7 +30,7 @@ def gitflow_release_start_command_string(version):
   return "git flow release start {0} {1}".format(version, "$WERCKER_GIT_COMMIT")
 
 def gitflow_release_finish_command_string(version):
-  message_text = core.field_flags["WERCKER_FLOWY_DEPLOY_TAG_MESSAGE"].replace(" ", "-")
+  message_text = core.field_flags["WERCKER_FLOWY_RELEASE_TAG_MESSAGE"].replace(" ", "-")
   tag_message = "{0}-{1}".format(message_text, version)
   return "git flow release finish -m \"{1}\" -p -F {0}".format(version, tag_message)
 
@@ -63,7 +63,7 @@ def run():
       "get-latest": get_latest,
       "get-next": get_next
     }
-    imsg, ierr = run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"], supported_actions)
+    imsg, ierr = run_action(core.field_flags["WERCKER_FLOWY_RELEASE_ACTION"], supported_actions)
     print(imsg, ierr)
     
     if ierr:

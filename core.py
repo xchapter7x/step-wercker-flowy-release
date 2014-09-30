@@ -3,12 +3,12 @@ import subprocess
 import sys
 
 required_fields = [
-  "WERCKER_FLOWY_DEPLOY_ACTION",
-  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME"
+  "WERCKER_FLOWY_RELEASE_ACTION",
+  "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME"
 ]
 
 def get_active_flag():
-  active_string = os.environ.get("WERCKER_FLOWY_DEPLOY_ACTIVE", "true")
+  active_string = os.environ.get("WERCKER_FLOWY_RELEASE_ACTIVE", "true")
   active_flag = True
 
   if active_string == "false":
@@ -17,12 +17,12 @@ def get_active_flag():
   return active_flag
 
 field_flags = {
-  "WERCKER_FLOWY_DEPLOY_ACTION":              os.environ.get("WERCKER_FLOWY_DEPLOY_ACTION", None),
-  "WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_VARIABLE_NAME", None),
-  "WERCKER_FLOWY_DEPLOY_ACTIVE":              get_active_flag(),
-  "WERCKER_FLOWY_DEPLOY_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
-  "WERCKER_FLOWY_DEPLOY_START_VERSION":       os.environ.get("WERCKER_FLOWY_DEPLOY_START_VERSION", "v01.00.0001"),
-  "WERCKER_FLOWY_DEPLOY_TAG_MESSAGE":         os.environ.get("WERCKER_FLOWY_DEPLOY_TAG_MESSAGE", "Auto-Generated-Tag")
+  "WERCKER_FLOWY_RELEASE_ACTION":              os.environ.get("WERCKER_FLOWY_RELEASE_ACTION", None),
+  "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME", None),
+  "WERCKER_FLOWY_RELEASE_ACTIVE":              get_active_flag(),
+  "WERCKER_FLOWY_RELEASE_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_RELEASE_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
+  "WERCKER_FLOWY_RELEASE_START_VERSION":       os.environ.get("WERCKER_FLOWY_RELEASE_START_VERSION", "v01.00.0001"),
+  "WERCKER_FLOWY_RELEASE_TAG_MESSAGE":         os.environ.get("WERCKER_FLOWY_RELEASE_TAG_MESSAGE", "Auto-Generated-Tag")
 }
 
 def required_field_check(required_fields, env_variables):
@@ -38,7 +38,7 @@ def required_field_check(required_fields, env_variables):
   return (msg, checkPassed)
 
 def is_active():
-  return field_flags["WERCKER_FLOWY_DEPLOY_ACTIVE"]
+  return field_flags["WERCKER_FLOWY_RELEASE_ACTIVE"]
 
 def should_run():
   msg, passed = required_field_check(required_fields, os.environ)
@@ -50,7 +50,7 @@ def version_increment_string(current_version):
 
 def tag_match_string():
   output = ""
-  return ("git tag -l | egrep \"%s\"" % field_flags["WERCKER_FLOWY_DEPLOY_TAG_REGEX"])
+  return ("git tag -l | egrep \"%s\"" % field_flags["WERCKER_FLOWY_RELEASE_TAG_REGEX"])
 
 def make_array_from_stdout(output):
   output = output.rstrip("\n").split("\n")
@@ -84,7 +84,7 @@ def get_next_tag(functor):
   current = get_current_tag(functor)
   
   if current == None:
-    current = field_flags["WERCKER_FLOWY_DEPLOY_START_VERSION"]
+    current = field_flags["WERCKER_FLOWY_RELEASE_START_VERSION"]
 
   out, err = functor(version_increment_string(current))
   return out[0]
