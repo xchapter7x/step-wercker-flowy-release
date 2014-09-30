@@ -26,11 +26,19 @@ def get_latest(functor):
 def get_next(functor):
   return get_a_tag_using(functor, core.get_next_tag)
 
-def create_tag(functor):
-  return (None, False)
+def gitflow_release_start_command_string(version):
+  return "git flow release start {0} {1}".format(version, "$WERCKER_GIT_COMMIT")
 
-def cut_release(functor):
-  return (None, False)
+def gitflow_release_finish_command_string(version):
+  message_text = core.field_flags["WERCKER_FLOWY_DEPLOY_TAG_MESSAGE"].replace(" ", "-")
+  tag_message = "{0}-{1}".format(message_text, version)
+  return "git flow release finish -m \"{1}\" -p -F {0}".format(version, tag_message)
+
+def complete_release(functor):
+  tag = core.get_next_tag(functor)
+  smsg, serr = functor(gitflow_release_start_command_string(tag))
+  fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
+  return (smsg+fmsg, (serr or ferr))
 
 def run_action(action, supported_actions):
   msg = ""
@@ -51,10 +59,9 @@ def run():
 
   if not err:
     supported_actions = {
-      "create-tag": create_tag,
+      "complete-release": complete_release,
       "get-latest": get_latest,
-      "get-next": get_next,
-      "cut-release": cut_release
+      "get-next": get_next
     }
     imsg, ierr = run_action(core.field_flags["WERCKER_FLOWY_DEPLOY_ACTION"], supported_actions)
     print(imsg, ierr)
@@ -67,16 +74,4 @@ def run():
 
 if __name__ == '__main__':
   run()
-
-
-  
-"""
-print("do nothing")
-out, err = system_call(tag_match_string())
-print(out, err)
-out, err = system_call(version_increment_string("v1.0.4"))
-print(out, err)
-print( get_current_tag(system_call) )
-print(  get_next_tag(system_call) )
-"""
 

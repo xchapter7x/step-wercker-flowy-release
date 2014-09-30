@@ -3,6 +3,11 @@ import run
 import core
 import os
 
+control_version = "v1.0.3"
+
+def mock_version_functor(cmdString):
+  return ([control_version], False)
+
 def mock_success_passthrough(cmdString):
   return ([cmdString], False)
 
@@ -89,34 +94,16 @@ class RunTestCase(unittest.TestCase):
     latest, err = run.get_next(mock_success_passthrough)
     self.assertTrue(err)
 
-
-
-
-
-
-
-
-
-
-
-
-  def test_for_create_tag(self):
+  def test_for_complete_release(self):
     """
-    test
+    should return no errors from either
+    command and a proper concatenation of 
+    return message values
     """
-    control = None
-    latest, err = run.create_tag(mock_error_passthrough)
+    control = [control_version, control_version]
+    latest, err = run.complete_release(mock_version_functor)
     self.assertEqual(latest, control)
-
-
-  def test_for_cut_release(self):
-    """
-    test
-    """
-    control = None
-    latest, err = run.cut_release(mock_error_passthrough)
-    self.assertEqual(latest, control)
-
+    self.assertFalse(err)
 
 if __name__ == '__main__':
   unittest.main()

@@ -10,7 +10,7 @@ SAMPLE USAGE:
 deploy:
   steps:
     - xchapter7x/flowy-deploy:
-        action: "create-tag | get-latest | get-next | cut-release"
+        action: "get-latest | get-next | complete-release"
         tag_variable_name: "my_tag_var" 
         active: true                                              #default
         tag_regex: "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"    #default
