@@ -4,7 +4,9 @@ import sys
 
 required_fields = [
   "WERCKER_FLOWY_RELEASE_ACTION",
-  "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME"
+  "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME",
+  "WERCKER_FLOWY_RELEASE_GIT_NAME",
+  "WERCKER_FLOWY_RELEASE_GIT_EMAIL"
 ]
 
 def get_active_flag():
@@ -19,6 +21,8 @@ def get_active_flag():
 field_flags = {
   "WERCKER_FLOWY_RELEASE_ACTION":              os.environ.get("WERCKER_FLOWY_RELEASE_ACTION", None),
   "WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME":   os.environ.get("WERCKER_FLOWY_RELEASE_TAG_VARIABLE_NAME", None),
+  "WERCKER_FLOWY_RELEASE_GIT_NAME":            os.environ.get("WERCKER_FLOWY_RELEASE_GIT_NAME", None),
+  "WERCKER_FLOWY_RELEASE_GIT_EMAIL":           os.environ.get("WERCKER_FLOWY_RELEASE_GIT_EMAIL", None),
   "WERCKER_FLOWY_RELEASE_ACTIVE":              get_active_flag(),
   "WERCKER_FLOWY_RELEASE_TAG_REGEX":           os.environ.get("WERCKER_FLOWY_RELEASE_TAG_REGEX", "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"),
   "WERCKER_FLOWY_RELEASE_START_VERSION":       os.environ.get("WERCKER_FLOWY_RELEASE_START_VERSION", "v01.00.0001"),

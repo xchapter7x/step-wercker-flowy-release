@@ -36,6 +36,8 @@ def gitflow_release_finish_command_string(version):
 
 def complete_release(functor):
   tag = core.get_next_tag(functor)
+  functor("git config --global user.name \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_NAME"]))
+  functor("git config --global user.email \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_EMAIL"]))
   functor("git checkout -b master origin/master")
   functor("git checkout -b develop origin/develop")
   functor("git flow init -fd")
