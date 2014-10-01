@@ -94,8 +94,8 @@ def run():
     print("FAILED!!! %s" % msg)
     exitcode = 1
 
-  exit(exitcode)
+  return exitcode
 
 if __name__ == '__main__':
-  run()
+  exit(run())
 
