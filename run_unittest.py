@@ -100,7 +100,7 @@ class RunTestCase(unittest.TestCase):
     command and a proper concatenation of 
     return message values
     """
-    control = [control_version, control_version, control_version, control_version]
+    control = [control_version, control_version, control_version]
     latest, err = run.complete_release(mock_version_functor)
     self.assertEqual(latest, control)
     self.assertFalse(err)

@@ -35,10 +35,7 @@ def gitflow_release_finish_command_string(version):
   return "git flow release finish -m \"{1}\" {0}".format(version, tag_message)
 
 def gitflow_release_push_string():
-  return "git checkout master && git push origin master"
-
-def gitflow_relase_push_tags():
-  return "git push --tags"
+  return "git checkout master && git push origin master && git push --tags"
 
 def setup_git_state(functor):
   functor("git config --global user.name \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_NAME"]))
@@ -52,12 +49,11 @@ def complete_release(functor):
   tag = core.get_next_tag(functor)
   smsg, serr = functor(gitflow_release_start_command_string(tag))
   fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
-  tmsg, terr = functor(gitflow_relase_push_tags())
   pmsg, perr = functor(gitflow_release_push_string())
   print(functor("git tag -l"))
   print(functor("git log master | head -10"))
-  msg_chain = smsg+fmsg+tmsg+pmsg
-  err_chain = (serr or ferr or terr or perr)
+  msg_chain = smsg+fmsg+pmsg
+  err_chain = (serr or ferr or perr)
   return (msg_chain, err_chain)
 
 def run_action(action, supported_actions):
