@@ -18,4 +18,4 @@ build:
     - script:
         name: Run some basic unit tests
         code: |
-          ls *_unittest.py | awk '{system("python " $1)}'
+          export RUN_TEST="echo 'running tests'"; for i in `ls *_unittest.py`;do RUN_TEST=$RUN_TEST" && python $i";done; echo $RUN_TEST | sh
