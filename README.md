@@ -14,7 +14,7 @@ deploy:
         tag_variable_name: "my_tag_var" 
         git_name: ""
         git_email: ""
-        active: true                                              #default
+        active: true | false                                      #default
         tag_regex: "v([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,4})"    #default
         start_version: "v01.00.0001"                              #default
         tag_message: "Auto-Tag"                                   #default

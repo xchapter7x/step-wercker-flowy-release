@@ -44,7 +44,6 @@ def setup_git_state(functor):
 
 def complete_release(functor):
   tag = core.get_next_tag(functor)
-  setup_git_state(functor)
   smsg, serr = functor(gitflow_release_start_command_string(tag))
   fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
   print(functor("git tag -l"))
@@ -58,6 +57,7 @@ def run_action(action, supported_actions):
   err = False
   
   if action in supported_actions:
+    setup_git_state(core.system_call)
     msg, err = supported_actions[action](core.system_call)
 
   else:
