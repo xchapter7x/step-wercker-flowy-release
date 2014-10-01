@@ -51,7 +51,6 @@ def should_run():
 
 def version_increment_string(current_version):
   return """echo """+current_version+""" | perl -ne 'chomp; print join(".", splice(@{[split/\./,$_]}, 0, -1), map {++$_} pop @{[split/\./,$_]});'"""
-  #return """echo """+current_version+""" | awk -F. -v OFS=. 'NF==1{print ++$NF};NF>1{if(length($NF+1)>length($NF))$(NF-1)++;$NF=sprintf("%0*d",length($NF),($NF+1)%(10^length($NF))); print}'"""
 
 def tag_match_string():
   output = ""
