@@ -34,13 +34,17 @@ def gitflow_release_finish_command_string(version):
   tag_message = "{0}-{1}".format(message_text, version)
   return "git flow release finish -F -k -p -m \"{1}\" {0}".format(version, tag_message)
 
-def complete_release(functor):
-  tag = core.get_next_tag(functor)
+def setup_git_state(functor):
   functor("git config --global user.name \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_NAME"]))
   functor("git config --global user.email \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_EMAIL"]))
   functor("git checkout -b master origin/master")
   functor("git checkout -b develop origin/develop")
+  functor("git fetch --tags")
   functor("git flow init -fd")
+
+def complete_release(functor):
+  tag = core.get_next_tag(functor)
+  setup_git_state(functor)
   smsg, serr = functor(gitflow_release_start_command_string(tag))
   fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
   print(functor("git tag -l"))
