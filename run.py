@@ -32,7 +32,7 @@ def gitflow_release_start_command_string(version):
 def gitflow_release_finish_command_string(version):
   message_text = core.field_flags["WERCKER_FLOWY_RELEASE_TAG_MESSAGE"].replace(" ", "-")
   tag_message = "{0}-{1}".format(message_text, version)
-  return "git flow release finish -m \"{1}\" {0}".format(version, tag_message)
+  return "git flow release finish -p -m \"{1}\" {0}".format(version, tag_message)
 
 def complete_release(functor):
   tag = core.get_next_tag(functor)
@@ -45,7 +45,6 @@ def complete_release(functor):
   fmsg, ferr = functor(gitflow_release_finish_command_string(tag))
   print(functor("git tag -l"))
   print(functor("git log master | head -10"))
-  print(functor("git checkout master && git push origin master && git push --tags"))
   msg_chain = smsg+fmsg
   err_chain = (serr or ferr)
   return (msg_chain, err_chain)
@@ -78,6 +77,10 @@ def run():
     
     if ierr:
       exitcode = 1
+  
+  elif not core.is_active():
+    print("Step Skipped")
+    exitcode = 0
 
   else:
     print("FAILED!!! %s" % msg)
