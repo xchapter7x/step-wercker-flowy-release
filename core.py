@@ -74,12 +74,23 @@ def system_call(cmdString):
 
   return (output, err)
 
+def version_sorted(version_array):
+  v_sorted_response = []
+
+  try:
+    v_sorted_response = sorted(version_array, key=lambda s: map(int, s.split('.')), reverse=True)
+  
+  except:
+    v_sorted_response = sorted(version_array, key=lambda s: map(str, s.split('.')), reverse=True)
+
+  return v_sorted_response
+
 def get_current_tag(functor):
   current_tag = None
   out, err = functor(tag_match_string())
 
   if not err:
-    tags = sorted(out, reverse=True)
+    tags = version_sorted(out)
     current_tag = tags[0]
 
   return current_tag
