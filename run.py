@@ -35,7 +35,7 @@ def gitflow_release_finish_command_string(version):
   return "git flow release finish -m \"{1}\" {0}".format(version, tag_message)
 
 def gitflow_release_push_string():
-  return "git checkout master && git push origin master && git push --tags"
+  return "git push origin master && git push --tags"
 
 def setup_git_state(functor):
   functor("git config --global user.name \"{0}\"".format(core.field_flags["WERCKER_FLOWY_RELEASE_GIT_NAME"]))
