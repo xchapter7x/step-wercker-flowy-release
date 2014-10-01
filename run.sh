@@ -6,9 +6,8 @@ sudo dpkg -i /tmp/git-flow_0.4.1-2_all.deb
 python $WERCKER_STEP_ROOT/run.py
 
 if [ $? != 0 ]; then
-  echo "Failure"
-  exit 1
+  fail "Failure"
+
 else
-  echo "Success"
-  exit 0
+  success "Success"
 fi
