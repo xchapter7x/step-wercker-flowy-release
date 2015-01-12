@@ -3,6 +3,11 @@ import subprocess
 import sys
 import core
 
+def write_statefile(env_var_name, msg):
+  f = open('.statefile', 'w')
+  state_string = "export {0}={1}".format(env_var_name, msg)
+  f.write(state_string)
+
 def get_a_tag_using(functorArg, mainFunctor):
   msg = ""
   err = False
@@ -13,7 +18,8 @@ def get_a_tag_using(functorArg, mainFunctor):
   if env_var_name != None and tag != None:
     msg = tag
     os.environ[env_var_name] = msg
-
+    write_statefile(env_var_name, msg)
+    
   else:
     msg = "no variable name value passed or None Tag Value"
     err = True

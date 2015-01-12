@@ -5,6 +5,10 @@ sudo dpkg -i /tmp/git-flow_0.4.1-2_all.deb
 
 python $WERCKER_STEP_ROOT/run.py
 
+if [ -f .statefile ];then
+   source .statefile
+fi
+
 if [ $? != 0 ]; then
   fail "Failure"
 
