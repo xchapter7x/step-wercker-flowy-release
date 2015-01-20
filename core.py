@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import re
 
 required_fields = [
   "WERCKER_FLOWY_RELEASE_ACTION",
@@ -74,15 +75,19 @@ def system_call(cmdString):
 
   return (output, err)
 
+def sorted_key_func(s):
+  non_decimal = re.compile(r'[^\d.]+')
+  s = non_decimal.sub('', s)
+
+  if s == "":
+    s = "0.0.0"
+
+  res = map(int, s.split('.'))
+  return res
+
 def version_sorted(version_array):
   v_sorted_response = []
-
-  try:
-    v_sorted_response = sorted(version_array, key=lambda s: map(int, s.split('.')), reverse=True)
-  
-  except:
-    v_sorted_response = sorted(version_array, key=lambda s: map(str, s.split('.')), reverse=True)
-
+  v_sorted_response = sorted(version_array, key=sorted_key_func, reverse=True)
   return v_sorted_response
 
 def get_current_tag(functor):
