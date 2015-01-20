@@ -58,7 +58,7 @@ def complete_release(functor):
   pmsg, perr = functor(gitflow_release_push_string())
   print(functor("git tag -l"))
   print(functor("git log master | head -10"))
-  msg_chain = smsg+fmsg+pmsg
+  msg_chain = str(smsg)+str(fmsg)+str(pmsg)
   err_chain = (serr or ferr or perr)
   return (msg_chain, err_chain)
 
