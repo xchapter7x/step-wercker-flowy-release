@@ -51,6 +51,10 @@ def setup_git_state(functor):
   functor("git fetch --tags")
   functor("git flow init -fd")
 
+def listify(l1, l2, l3):
+  l = list(l1) + list(l2) + list(l3)
+  return l
+
 def complete_release(functor):
   tag = core.get_next_tag(functor)
   smsg, serr = functor(gitflow_release_start_command_string(tag))
@@ -58,7 +62,7 @@ def complete_release(functor):
   pmsg, perr = functor(gitflow_release_push_string())
   print(functor("git tag -l"))
   print(functor("git log master | head -10"))
-  msg_chain = str(smsg)+str(fmsg)+str(pmsg)
+  msg_chain = listify(smsg, fmsg, pmsg)
   err_chain = (serr or ferr or perr)
   return (msg_chain, err_chain)
 
