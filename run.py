@@ -55,6 +55,26 @@ def listify(l1, l2, l3):
   l = list(l1) + list(l2) + list(l3)
   return l
 
+def tag_only_release(functor):
+  tag = core.get_next_tag(functor)
+  print(functor("git checkout -fq "+str(os.environ["WERCKER_GIT_COMMIT"])))
+  print(functor("git submodule update --init --recursive"))
+  print(functor("echo $VERSION_TAG"))
+  print(functor("git branch"))
+  print(functor("git status"))
+  print(functor("git log | head -10"))
+  print(functor("git tag -a $VERSION_TAG -m \"version "+str(tag)+"\""))
+  print(functor("git checkout -b localbuild || true"))
+  print(functor("git checkout -b master origin/master || true"))
+  print(functor("git checkout master"))
+  print(functor("git pull origin master"))
+  print(functor("git merge localbuild"))
+  print(functor("git status"))
+  print(functor("git log | head -10"))
+  print(functor("git push origin master"))
+  print(functor("git push --tags"))
+  return (None, None)
+
 def complete_release(functor):
   tag = core.get_next_tag(functor)
   smsg, serr = functor(gitflow_release_start_command_string(tag))
@@ -86,6 +106,7 @@ def run():
 
   if not err:
     supported_actions = {
+      "tag-only-release": tag_only_release,
       "complete-release": complete_release,
       "get-latest": get_latest,
       "get-next": get_next
