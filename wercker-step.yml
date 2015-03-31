@@ -1,5 +1,5 @@
 name: flowy-release
-version: 1.0.8
+version: 1.0.9
 description: a wercker step to help with automatic deploys inspired by gitflow
 keywords:
   - gitflow
